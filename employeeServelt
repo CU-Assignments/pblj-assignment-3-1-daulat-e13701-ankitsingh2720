@@ -1,0 +1,48 @@
+import java.io.*;
+import java.sql.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+public class EmployeeServlet extends HttpServlet {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/yourdbname";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "yourpassword";
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String empId = request.getParameter("empId");
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            PreparedStatement pst;
+
+            if (empId != null && !empId.isEmpty()) {
+                pst = con.prepareStatement("SELECT * FROM employees WHERE id = ?");
+                pst.setInt(1, Integer.parseInt(empId));
+            } else {
+                pst = con.prepareStatement("SELECT * FROM employees");
+            }
+
+            ResultSet rs = pst.executeQuery();
+
+            out.println("<html><body>");
+            out.println("<h2>Employee List</h2>");
+            out.println("<form method='get'>");
+            out.println("Search by ID: <input type='text' name='empId' />");
+            out.println("<input type='submit' value='Search' /></form>");
+            out.println("<table border='1'><tr><th>ID</th><th>Name</th><th>Department</th><th>Salary</th></tr>");
+
+            while (rs.next()) {
+                out.println("<tr><td>" + rs.getInt("id") + "</td><td>" + rs.getString("name") +
+                        "</td><td>" + rs.getString("department") + "</td><td>" + rs.getDouble("salary") + "</td></tr>");
+            }
+
+            out.println("</table></body></html>");
+            con.close();
+        } catch (Exception e) {
+            out.println("<p>Error: " + e.getMessage() + "</p>");
+        }
+    }
+}
