@@ -1,0 +1,13 @@
+CREATE DATABASE userDB;
+USE userDB;
+
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(50) NOT NULL
+);
+
+INSERT INTO users (name, email, password) 
+VALUES ('John Doe', 'john@example.com', 'john123'),
+       ('Jane Smith', 'jane@example.com', 'jane456');
